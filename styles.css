@@ -1,0 +1,10 @@
+*{
+    background-color: rgba(102,157,248);
+}
+
+img, a{
+    display: block;
+    margin-left: auto; 
+    margin-right: auto; 
+    padding: 50px;
+}
