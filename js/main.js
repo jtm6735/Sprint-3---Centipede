@@ -373,6 +373,7 @@ function drawHUD(ctx){
             // the player dies and is sent to the game over screen.
             for (let x of centipedes){
                 if(aabbCollision(player.x,x.x,player.y,x.y,player.width,x.width,player.height,x.height)){
+		    localStorage.setItem('High Score', score);
                     document.location.href = "./gameOver.html";
                 }
             }
