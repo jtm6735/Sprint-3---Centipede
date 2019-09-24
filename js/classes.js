@@ -1,5 +1,5 @@
 "use strict";
-export{createMushroomSprites,createPlayerSprite,fireBullets,createCentipede};
+export{createMushroomSprites,createPlayerSprite,createSecondPlayerSprite,fireBullets,createCentipede};
 
 // The baseSprite class will act as the 
 // original sprite class for all the other
@@ -80,6 +80,13 @@ function createPlayerSprite(rect={left: 0,top: 0,width: 300,height: 300},width,h
     image.src = url; 
     let ship = new BaseSprite(300,650,width,height,speed,image);
     return ship;
+}
+
+function createSecondPlayerSprite(rect={left:0,top:0,width:300,height:300},width,height,speed,url){
+    let image = new Image();
+    image.src = url;
+    let secondShip = new BaseSprite(900,650, width,height,speed,image);
+    return secondShip;
 }
 
 // Creates the bullets shotusing the baseSprite properties

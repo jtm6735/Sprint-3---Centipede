@@ -26,7 +26,6 @@ const screenHeight = 800;
 const GameState=Object.freeze({
     START: Symbol("START"),
     MAIN: Symbol("MAIN"),
-    GAMEOVER: Symbol("GAMEOVER"),
     PAUSED: Symbol("PAUSED")
     
 });
@@ -38,7 +37,12 @@ const keyboard = Object.freeze({
 	LEFT: 		37, 
 	UP: 		38, 
 	RIGHT: 		39, 
-	DOWN: 		40
+	DOWN: 		40,
+    A:          65,
+    D:          68,
+    S:          83,
+    W:          87,
+    ENTER:      13
 });
 
 const keys = [];
@@ -58,6 +62,7 @@ let bullets = [];
 let centipedes = [];
 let currentLevel = 1;
 let player;
+let player2;
 let totalScore;
 let levelScore;
 let cageCount;
@@ -74,6 +79,8 @@ let isPaused=null;
 let rect = {left: margin, top: margin, width: screenWidth - margin*2, height: screenHeight-margin*2};
 let rectS = {left: margin, top: margin, width: screenWidth - margin*2, height: screenHeight-margin*3};
 
+
+
 // The init function is used to initialize
 // elements as soon as the window opens.
 // Information regarding the backgroundImage
@@ -81,30 +88,29 @@ let rectS = {left: margin, top: margin, width: screenWidth - margin*2, height: s
 // is also where we create the initial centipede
 // and mushrooms in their own seperate arrays.
 function init(argImageData){
-    backGroundImage.src = "images/centiBackground.png";
-    backgroundSound= new sound("audio/komiku58.mp3");   
-    laserSound = new sound("audio/laser1.wav");
-    hitSound = new sound("audio/attack_hit.mp3");
+    backGroundImage.src = "images/backgroundGame2-02PS.png";
+    
+    //backgroundSound= new sound("audio/komiku58.mp3");   
+    //laserSound = new sound("audio/laser1.wav");
+    //hitSound = new sound("audio/attack_hit.mp3");
+    
     imageData = argImageData;
     score = 0;
     isPaused=window;
     isPaused.onblur=paused;
     isPaused.onfocus=play;
     
-    
-    // Spawns an intial ten centipedes
-    // into the game using [i] to position
-    // them in a line.
-    for(let i=0;i<10;i++){
-         centipedes.push(createCentipede(rectS,(300-(i*30)),60, .3, "images/centipedeHeadfRight.png",false));
-    }
-   
     // This will set the player to have a create using the
     // parameters given in the function
-    player = createPlayerSprite(rectS,40,40,.4,"images/centiShip.png");
+    player = createPlayerSprite(rectS,40,40,.4,"images/sunturt.png");
+    //player2 = createSecondPlayerSprite(rectS,40,40,.4,"images/blueturt.png");
+    
+    spawnCentipedes();
     
     // Spawns the initial set of mushrooms.
     spawnMushrooms();
+    
+
 
     // Enables the canvas to be clickable
     // with the doMousedown.
@@ -136,26 +142,16 @@ function drawHUD(ctx){
         // In the GameState.Start, text is drawn
         // in order to show off what the title screen
         // is.
+    
         case GameState.START:
-            ctx.shadowColor = "black";
-            ctx.shadowBlur = 15;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
             ctx.save();
-            ctx.fillStyle = "purple";
+            ctx.fillStyle = "black";
             ctx.rect(0,0,1200,800);
             ctx.fill();
             ctx.restore();
-            fillText(ctx,"Centipede!",screenWidth/2, screenHeight/2-200, "36pt 'Press Start 2P', cursive", "red");
-            strokeText(ctx,"Centipede!",screenWidth/2, screenHeight/2-200, "36pt 'Press Start 2P', cursive", "white", 2);
-            fillText(ctx,"By Jason M. and Zach H.",screenWidth/2, screenHeight/2, "18pt 'Press Start 2P', cursive", "red");
-            strokeText(ctx,"By Jason M. and Zach H.",screenWidth/2, screenHeight/2, "18pt 'Press Start 2P', cursive", "white", .5);
-			fillText(ctx,"Press Anywhere to Start",screenWidth/2, screenHeight/2+150, "14pt 'Press Start 2P', cursive", "blue");
-            strokeText(ctx,"Press Anywhere to Start",screenWidth/2, screenHeight/2+150, "14pt 'Press Start 2P', cursive", "white",.5);
-            fillText(ctx,"Use the arrow keys to move!",screenWidth/2, screenHeight/2+250, "14pt 'Press Start 2P', cursive", "blue");
-            strokeText(ctx,"Use the arrow keys to move!",screenWidth/2, screenHeight/2+250, "14pt 'Press Start 2P', cursive", "white",.5);
-            fillText(ctx,"Use spacebar to shoot!",screenWidth/2, screenHeight/2+350, "14pt 'Press Start 2P', cursive", "blue");
-            strokeText(ctx,"Use spacebar to shoot!",screenWidth/2, screenHeight/2+350, "14pt 'Press Start 2P', cursive", "white",.5);
+            fillText(ctx,"Loading...",screenWidth/2, screenHeight/2, "36pt 'Press Start 2P', cursive", "black");
+            strokeText(ctx,"Loading...",screenWidth/2, screenHeight/2, "36pt 'Press Start 2P', cursive", "white", 2);
+            setTimeout(changeScene,500)
             break;
         
         // In the GameState.Main, we will be checking
@@ -164,6 +160,8 @@ function drawHUD(ctx){
         // to how one would use a bool. This allows for multiple
         // inputs to be recording at once without stuttering movement
         case GameState.MAIN:
+
+            
            ctx.shadowColor = "black";
            ctx.shadowBlur = 5;
 	       if (keys[keyboard.DOWN]){
@@ -193,20 +191,26 @@ function drawHUD(ctx){
                 player.dx=0;        
             }
             
+            
             // The background image is constantly beign redrawn
             // so that multiple images are not left on the screen
             // where images have already passed over.
-            ctx.save();
-            ctx.drawImage(backGroundImage,-75,-90);
-            ctx.restore();
             
             ctx.save();
+
+            ctx.drawImage(backGroundImage,0,0);
+            ctx.restore();
+            
+            
+            
+            //ctx.save();
             // Loading into the second screen solely
             // The loop will make it so that the 
             // song will loop on end.
-            backgroundSound.loop=true;
-            backgroundSound.play();
-            ctx.restore();
+            //backgroundSound.loop=true;
+            //backgroundSound.play();
+            //ctx.restore();
+            
             
             // This text keeps track of the player's score
             // in the upper left hand corner
@@ -225,7 +229,7 @@ function drawHUD(ctx){
             // avatar hits the boundaries of the box. If so,
             // the player will bounce back in the opposite direction
             // of which they hit the box.
-            if(player.x+player.width+player.dx>= 610){
+            if(player.x+player.width+player.dx>= 1210){
                 player.dx = -player.speed/2;
             }
             if(player.x <= -10){
@@ -268,11 +272,11 @@ function drawHUD(ctx){
                 c.dx = c.speed;
                 if(c.x+c.width+c.dx >=1200){
                     let reverse = new Image();
-                    reverse.src ="images/centipedeHeadfLeft.png";
-                    c.x =550;
+                    reverse.src ="images/bottleLeft.png";
+                    c.x =1150;
                     c.y=c.y+20;
                     if(c.speed<=.48){
-                        c.speed *= 1.08; 
+                        //c.speed *= 1.08; 
                     }
                     c.speed = -c.speed;
                     if(c.boolValue==false){
@@ -282,11 +286,11 @@ function drawHUD(ctx){
                 }
                 if(c.x+c.dx<= 0){
                     let forward = new Image();
-                    forward.src="images/centipedeHeadfRight.png";
+                    forward.src="images/bottleRight.png";
                     c.x=10;
                     c.y=c.y+20;
                     if(c.speed>= -.48){
-                        c.speed *= 1.08; 
+                        //c.speed *= 1.08; 
                     }
                     c.speed = -c.speed;
                     if(c.boolValue==true){
@@ -310,15 +314,15 @@ function drawHUD(ctx){
             for(let x of centipedes){
                 for(let y of bullets){
                     if(aabbCollision(x.x,y.x,x.y,y.y,x.width,y.width,x.height,y.height)){
-                        hitSound.play();
+                        /*hitSound.play();*/
                         remove(bullets, y);
                         remove(centipedes, x);
-                        mushrooms.push(createMushroomSprites(rectS,x.x,x.y,20,20,"images/depressedMush.png"));
+                        mushrooms.push(createMushroomSprites(rectS,x.x,x.y,20,20,"images/fish.png"));
                         score += 20;
                         if(centipedes.length <= 0){
                             spawnMushrooms();
                             for(let i = 0; i <counter ; i++){
-                                centipedes.push(createCentipede(rectS,(300-(i*24)),60, x.speed=x.speed+.001, "images/centipedeHeadfRight.png",false));   
+                                centipedes.push(createCentipede(rectS,(300-(i*24)),60, x.speed=x.speed+.005, "images/bottleRight.png",false));   
                             }
                             counter+=2;
                         } 
@@ -350,13 +354,13 @@ function drawHUD(ctx){
                         x.y = x.y + 20;
                         if(x.boolValue == false){
                             let reverse = new Image();
-                            reverse.src ="images/centipedeHeadfLeft.png";
+                            reverse.src ="images/bottleLeft.png";
                             x.image = reverse;
                             x.boolValue = true;
                         }
                         else if(x.boolValue==true){
                             let forward = new Image();
-                            forward.src="images/centipedeHeadfRight.png";
+                            forward.src="images/bottleRight.png";
                             x.image=forward;
                             x.boolValue = false;
                         }
@@ -369,7 +373,7 @@ function drawHUD(ctx){
             // the player dies and is sent to the game over screen.
             for (let x of centipedes){
                 if(aabbCollision(player.x,x.x,player.y,x.y,player.width,x.width,player.height,x.height)){
-                    gameState = GameState.GAMEOVER;
+                    document.location.href = "./gameOver.html";
                 }
             }
             ctx.restore(); 
@@ -382,12 +386,14 @@ function drawHUD(ctx){
         case GameState.PAUSED:
             ctx.shadowColor = "black";
             ctx.shadowBlur = 15;
+            /*
             backgroundSound.stop();
+            */
             ctx.save();
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.save();
-            ctx.fillStyle = "purple";
+            ctx.fillStyle = "#589CFF";
             ctx.rect(0,0,1200,800);
             ctx.fill();
             ctx.restore();
@@ -396,28 +402,7 @@ function drawHUD(ctx){
             ctx.restore();
             break;
             
-        // This gameState is accessed when the player is hit 
-        // by a centipede. On this screen, the music stops playing
-        // and the player is given their final score.
-        case GameState.GAMEOVER:
-            backgroundSound.stop();
-            ctx.save();
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.save();
-            ctx.fillStyle = "purple";
-            ctx.rect(0,0,1200,800);
-            ctx.fill();
-            ctx.restore();
-            ctx.shadowColor = "black";
-            ctx.shadowBlur = 15;
-            fillText(ctx,"Game over!",screenWidth/2, screenHeight/2, "36pt 'Press Start 2P', cursive", "red");
-            strokeText(ctx,"Game over!",screenWidth/2, screenHeight/2, "36pt 'Press Start 2P', cursive", "white", 2);
-            fillText(ctx,"Score: " + score, screenWidth/2, screenHeight/2 +150, "20pt 'Press Start 2P', cursive", "black");
-            strokeText(ctx,"Score: " + score,screenWidth/2, screenHeight/2 + 150, "20pt 'Press Start 2P', cursive", "white", 1);
-            restore();
-            break;
-            
+
         default:
             throw new Error(MyErrors.drawHUDswitch);
             
@@ -434,10 +419,12 @@ function doMousedown(e){
         // In the GameState.Start, a mouse click
         // will advance the screen to the main
         // gameplay screen.
+        
         case GameState.START:
             gameState = GameState.MAIN;
             break;
-            
+        
+        
         // Clicking the screen in the main state
         // will not do anything.    
         case GameState.MAIN:
@@ -448,15 +435,6 @@ function doMousedown(e){
         case GameState.PAUSED:
             break;
 
-        // In the gameOver state, the player has one option.
-        // This option is to click the screen in order
-        // to advance. Doing this will put the user back
-        // on the title screen of the game.
-        case GameState.GAMEOVER:
-            location.reload();
-            gameState = GameState.START;
-            break;
-            
         default:
             throw new Error(MyErrors.mousedownSwitch);
     }
@@ -476,14 +454,27 @@ window.onkeyup = (e) => {
 // is pressed, a laser noise will play and a
 // bullet will be added to the array and fire out
 // of the ship.
+
+// THIS IS FOR PLAYER ONE - CHANGE SPACE TO SOMETHING ELSE
 window.onkeydown = (e)=>{
     var char = String.fromCharCode(e.keyCode);
 	keys[e.keyCode] = true;
-    if(keys[keyboard.SPACE]){
-        laserSound.play();
-        bullets.push(fireBullets(rectS,player.x + 15,player.y- 10, .3, "images/centiBullet.png"));
+    if(keys[keyboard.ENTER]){
+        /*laserSound.play();*/
+        bullets.push(fireBullets(rectS,player.x + 15,player.y- 10, .3, "images/net.png"));
     }
 };
+
+/* 
+window.onkeydown = (e)=>{
+    var char = String.fromCharCode(e.keyCode);
+    keys[e.keyCode] = true;
+    if(keys[keyboard.SPACE]){
+    bullets.push(fireBullets(rectS,player2.x + 15, player.y - 10, .3, "images/centiBullet.png));
+    }
+}
+
+*/
 
 // This function will be used to write 
 // text along the canvas when needed.
@@ -530,7 +521,9 @@ function getRandom(max){
 // This function gives information in order
 // for sound to be played. Within this function,
 // the song is given two more functions, play
-// and stop.
+// and stop
+
+/*
 function sound(source){
     this.sound = document.createElement("audio");
     this.sound.src =source;
@@ -542,7 +535,7 @@ function sound(source){
         this.sound.pause();
     }
 }
-
+*/
 // The paused and play functions are
 // to be used in accordinance with
 // when the player clicks on and off
@@ -568,8 +561,22 @@ function spawnMushrooms(){
         for(let j=100;j<600;j+=20){
             rand = getRandom(50);
             if(rand>45){
-                mushrooms.push(createMushroomSprites(rectS,i,j,20,20,"images/depressedMush.png")); 
+                mushrooms.push(createMushroomSprites(rectS,i,j,20,20,"images/fish.png")); 
             }    
         }
     }
+}
+
+function spawnCentipedes(){
+        // Spawns an intial ten centipedes
+    // into the game using [i] to position
+    // them in a line.
+    for(let i=0;i<10;i++){
+        centipedes.push(createCentipede(rectS,(300-(i*30)),60, .3, "images/bottleRight.png",false));
+        console.log("Centipede Spawned " + i);
+    }
+}
+
+function changeScene(){
+    gameState = GameState.MAIN;
 }
