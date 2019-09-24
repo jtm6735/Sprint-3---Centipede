@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
-	<title>Canvas & OLOO</title>
+	<title>Turtle.IO</title>
 </head>
 <body style="background-color: #589CFF;">
     <div style=" width: 100%; text-align: center; padding-top:50px;">
@@ -17,7 +17,7 @@
         </h1>
     </div>
     <div style=" width: 90%; text-align: center; padding-top:50px;" id="highScores">
-        <h1 style="color: #ffffff; font-family: 'Press Start 2P', cursive; text-shadow: 2px 2px #000000; font-size: 24px;">
+        <h1 id="highScoreSingle" style="color: #ffffff; font-family: 'Press Start 2P', cursive; text-shadow: 2px 2px #000000; font-size: 24px;">
             Solo Play:
         </h1>
         <br>
@@ -30,9 +30,11 @@
         </h1>
     </div>
     <div style="width: 100%; text-align: center; padding-top: 200px;">
-        <img onclick="document.location.href = 'https://www.google.com/webhp?hl=en&sa=X&ved=0ahUKEwjKg4b8zujkAhVRm-AKHf2JDV4QPAgH'" style="cursor: pointer; padding-right: 50px;" src="images/HomeScreen.png" alt="Home Button" height="123" width="423">
-        <img onclick="document.location.href = 'https://www.google.com/webhp?hl=en&sa=X&ved=0ahUKEwjKg4b8zujkAhVRm-AKHf2JDV4QPAgH'" style="cursor: pointer;" src="images/Donate.png" alt="Home Button" height="123" width="423">
-        <img onclick="document.location.href = 'https://www.google.com/webhp?hl=en&sa=X&ved=0ahUKEwjKg4b8zujkAhVRm-AKHf2JDV4QPAgH'" style="padding-left: 50px; cursor: pointer;" src="images/Replay.png" alt="Home Button" height="123" width="423">
+        <a href="start.html"><img style='width: 25%; padding-bottom: 0px; padding-right: 50px;' src="images/buttonHome.png" alt="Home Screen"></a>
+<!--        <a href="help.html"><img style='width: 25%; padding: 0px;' src="images/buttonHelp.png" alt="Help Our Ocean"></a>-->
     </div>
+    
+    <script>
+        document.querySelector("#highScoreSingle").innerHTML = "Solo Play: " + localStorage.getItem("High Score");
+    </script>
 </body>
-</html>
